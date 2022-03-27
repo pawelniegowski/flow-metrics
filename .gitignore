@@ -1,0 +1,7 @@
+*.tif
+*.csv
+__MACOSX/ 
+*.png
+.DS_Store
+tmp.txt
+Screeny CTC*/
