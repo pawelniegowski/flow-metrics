@@ -32,9 +32,9 @@ interactiveRow = None
 
 if len(sys.argv) < 2:
     print("""Usage: 
-python CTCmeasure.py <directory with .tifs>
+python flow-metrics.py <directory with .tifs>
     Measures all TIF images in batch mode, writing to measurements.csv.
-python CTCmeasure.py <single .tif file> [--interactive] [--irow=n]
+python flow-metrics.py <single .tif file> [--interactive] [--irow=n]
     Measures a single file, showing final graphical result and printing metrics.
     --interactive - display step-by-step graphical output
     --irow=3 - display step-by-step graphical output for row number 3
