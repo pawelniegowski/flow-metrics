@@ -506,9 +506,11 @@ else:
         wrt = csv.DictWriter(f,fieldnames=headers)
         wrt.writeheader()
         
-        searchdir = os.path.join(target,"**\*.tif")
+        searchdir = os.path.join(target,"**")
         print("Searching for TIF files in %s and subdirs..." % searchdir)
         for path in glob.glob(searchdir, recursive=True):
+            if not path.endswith(".tif") or os.path.split(path)[1].startswith('.'):
+                continue
             print(path)
             output, im = processImage(path)
             for row in output:
