@@ -67,7 +67,9 @@ def findRows(px, height, column):
         else:
             if px[column,i] != bgcolor and isBrightfieldBG(px[column,i]):
                 inRow = True
-                rowStart = i        
+                rowStart = i
+    if inRow:
+        rowsFound.append( (rowStart,height) )
     return rowsFound
     
 def findColumnWidth(im, width, row):
