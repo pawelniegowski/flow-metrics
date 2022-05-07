@@ -4,4 +4,6 @@ __MACOSX/
 *.png
 .DS_Store
 tmp.txt
+log.txt
 Screeny CTC*/
+*.ods

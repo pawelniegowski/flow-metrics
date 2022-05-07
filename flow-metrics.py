@@ -11,7 +11,7 @@ from tabulate import tabulate
 
 import glob, os, sys, math, csv, subprocess
 
-PIXELS_PER_UM = float(12)/10  
+PIXELS_PER_UM = float(60)/10  
 
 SHADED_MARGIN = 5
 BRIGHTFIELD_BG_AVERAGE = 142
@@ -45,7 +45,7 @@ python flow-metrics.py <single .tif file> [--interactive] [--irow=n]
 
 def isBrightfieldBG(color):
     for i in range(3):
-        if color[i] < 120 or color[i] > 160:
+        if color[i] < 120 or color[i] > 180:
             return False
     return True
 
@@ -366,10 +366,9 @@ def processImage(imgPath):
     columnWidth = findColumnWidth(im, rgbIm.width,rows[0][0]+SHADED_MARGIN)
     columnNumber = int(rgbIm.width / (columnWidth+5))
     columnWidth = int(rgbIm.width / (columnNumber+1))
-   
-    outputCells = [ ] 
+
+    outputCells = [ ]
     
-   
     draw = ImageDraw.Draw(rgbIm)
     
     
