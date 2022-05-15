@@ -9,7 +9,7 @@ import pytesseract
 from scipy import ndimage
 from tabulate import tabulate
 
-import glob, os, sys, math, csv, subprocess
+import glob, os, sys, math, csv, subprocess, re
 
 PIXELS_PER_UM = float(60)/10  
 
@@ -509,7 +509,23 @@ else:
         
         searchdir = os.path.join(target,"**")
         print("Searching for TIF files in %s and subdirs..." % searchdir)
-        for path in glob.glob(searchdir, recursive=True):
+        paths = glob.glob(searchdir, recursive=True)
+        
+        def panelKeyFunc(p):
+            # we expect a pattern like 3TB_1.tif
+            p = os.path.split(p)[1]
+            m = re.match( r"(\d+)(\D+)(\d+)\D*\..*" , p )
+            if m:
+               patient, infix, panel = m.groups()
+               patient = "%05d" % int(patient)
+               panel = "%05d" % int(panel)
+               print(patient+infix+panel)
+               return patient+infix+panel
+
+            return p
+        
+        paths = sorted(paths,key=panelKeyFunc)
+        for path in paths:
             if not path.endswith(".tif") or os.path.split(path)[1].startswith('.'):
                 continue
             print(path)
