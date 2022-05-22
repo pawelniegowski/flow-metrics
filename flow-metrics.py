@@ -354,6 +354,17 @@ def getIntensityInContour(pilIm, contour):
     median = np.ma.median(maskedMap)
     maxv = maskedMap.max()
     return (mean, median, maxv)
+    
+def getFocus(pilIm):
+    ocvIm = cv.cvtColor(np.array(pilIm), cv.COLOR_RGB2BGR)
+    ocvIm = ocvIm[40:pilIm.height-40, 40:pilIm.width-40] # skip borders and number
+    grayscale = cv.cvtColor(ocvIm, cv.COLOR_BGR2GRAY)
+    ddepth = cv.CV_16S
+    gradientX = cv.Sobel(grayscale, ddepth, 0, 1, ksize=3, scale=1, delta=0, borderType=cv.BORDER_DEFAULT)
+    gradientY = cv.Sobel(grayscale, ddepth, 1, 0, ksize=3, scale=1, delta=0, borderType=cv.BORDER_DEFAULT)
+    gradComposite = cv.addWeighted(cv.convertScaleAbs(gradientX),0.5,cv.convertScaleAbs(gradientY),0.5,0)
+    return np.sum(gradComposite)
+    
 
 def processImage(imgPath):
     global interactiveMode
@@ -376,6 +387,7 @@ def processImage(imgPath):
         sampleID = 0
         cvContours = None
         measurements = {}
+        focus = 0
         if interactiveRow != None:
             interactiveMode = interactiveRow == nrow
         
@@ -402,8 +414,12 @@ def processImage(imgPath):
                 separatedContours = [ removeDefects(x) for x in separatedContours ]
                 cellContours = [ clusterContour ] + separatedContours 
                 measurements[sampleID] = {}
+                
                 for n,cell in enumerate(cellContours):
                     measurements[sampleID][n] = {}
+                    
+               
+                focus = getFocus(rectIm) / cv.arcLength(clusterContour,True)
                 
             
             if i != 0: # average intensity per contour
@@ -461,7 +477,8 @@ def processImage(imgPath):
                 'indexInCluster': n,
                 'area': area / (PIXELS_PER_UM**2),
                 'diameterMax': maxDiameter / PIXELS_PER_UM,
-                'diameterMin': minDiameter / PIXELS_PER_UM
+                'diameterMin': minDiameter / PIXELS_PER_UM,
+                'focus': focus
                 #'diameter_min': minDiameter
             })
             outputCells.append(measurements[sampleID][n])
@@ -476,7 +493,7 @@ def processImage(imgPath):
 target = sys.argv[1]
 intensityMetricHeaders = [[ x+'_mean', x+'_median', x+'_max'] for x in COLUMN_NAMES[1:]]
 intensityMetricHeaders = [x for sub in intensityMetricHeaders for x in sub] #flatten
-headers = ['filename','patientID','readID', 'indexInCluster', 'cellsInCluster', 'area','diameterMin','diameterMax'] + intensityMetricHeaders
+headers = ['filename','patientID','readID', 'indexInCluster', 'cellsInCluster', 'area','diameterMin','diameterMax','focus'] + intensityMetricHeaders
 
 
 if target.endswith(".tif"):
